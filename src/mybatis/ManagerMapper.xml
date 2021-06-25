@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.ManagerDao">
+
+	
+	<select id="selectallcourse" resultType="pojo.Course">
+		select course.course_id,course.course_name,course.term,course.course_hour,teacher.name,teacher.teacher_id,teacher_hour
+		from course right join tc on course.course_id=tc.course_id right join teacher on tc.teacher_id=teacher.teacher_id 
+		where tc.tea_identity='主讲教师'
+	</select>
+	
+	<select id="selectallteacher" resultType="pojo.Teacher">
+		select * from teacher
+	</select>
+	
+
+	<insert id="addcourse" parameterType="pojo.Course">
+		insert into course (course_id,course_name,term,course_hour) values(#{course_id},#{course_name},#{term},#{course_hour})
+	</insert>
+	
+	<insert id="addteacher" parameterType="pojo.Teacher">
+		insert into teacher (teacher_id,name,sex,protitle,phone,user_id) values(#{teacher_id},#{name},#{sex},#{protitle},#{phone},#{user_id})
+	</insert>
+
+	<update id="updatecourse" parameterType="pojo.Course">
+		update course set course_name=#{course_name},term=#{term},course_hour=#{course_hour} where course_id = #{course_id}
+	</update>
+		
+	<update id="updateteacher" parameterType="pojo.Teacher">
+		update teacher set name=#{name},sex=#{sex},protitle=#{protitle},phone=#{phone} where teacher_id = #{teacher_id}
+	</update>
+	
+	<select id="selectidentity" parameterType="String" resultType="String">
+		select tc.tea_identity from tc,course 
+		where course.course_id=tc.course_id and course.course_name=#{course_name} and tc.tea_identity='主讲教师'
+	</select>
+	
+	<select id="selecttchours" parameterType="String" resultType="pojo.Tc">
+		select tc.teacher_hour from tc,course 
+		where course.course_id=tc.course_id and course.course_name=#{course_name}
+	</select>
+	
+	<select id="selectcoursehour" parameterType="String" resultType="Integer">
+		 select distinct course.course_hour from course,tc 
+		where course.course_id=tc.course_id and course.course_name=#{course_name}
+	</select>
+	
+	<select id="selecttchour" parameterType="pojo.Tc" resultType="Integer">
+		 select  tc.teacher_hour from course,tc,teacher 
+		where course.course_id=tc.course_id and teacher.teacher_id=tc.teacher_id 
+		and teacher.name=#{name} and course_name=#{course_name}
+	</select>
+	
+	<select id="selectcoursedetail" parameterType="String" resultType="pojo.Course">
+		select course.course_id,course.course_name,course.term,course.course_hour,teacher.teacher_id,teacher.name,tc.tea_identity,teacher_hour
+		from course inner join tc on course.course_id=tc.course_id inner join teacher on tc.teacher_id=teacher.teacher_id 
+		where course.course_id=#{course_id}
+	</select>
+	
+	<insert id="addtc" parameterType="pojo.Tc">
+		insert into tc(course_id,teacher_id,tea_identity,teacher_hour) values(#{course_id},#{teacher_id},#{tea_identity},#{teacher_hour})
+	</insert>
+	
+	<select id="selectcoursename" parameterType="String" resultType="String">
+		select course_name from course where course_id=#{course_id}
+	</select>
+</mapper>

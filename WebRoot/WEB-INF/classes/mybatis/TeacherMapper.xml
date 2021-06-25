@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.TeacherDao">
+
+	<select id="selectallcourse" parameterType="String" resultType="pojo.Course">
+		select course.course_id,course.course_name,course.term,course.course_hour,teacher.name,teacher.teacher_id,tc.tea_identity,teacher_hour
+		from course inner join tc on course.course_id=tc.course_id inner join teacher on tc.teacher_id=teacher.teacher_id 
+		where user_id=#{user_id}
+	</select>
+	
+	<select id="selectallshoukestudent" parameterType="String" resultType="pojo.Stutopic">
+		select course.course_name,
+		student.student_id,student.name,student.sex,student.major,student.classes,
+		sc.score,
+		topic.topic_id,topic,keyword,
+		stutopic.guidancer
+		from course right join sc on sc.course_id=course.course_id
+		right join student on student.student_id=sc.student_id 
+		left join stutopic on student.student_id=stutopic.student_id
+		left join topic on stutopic.topic_id=topic.topic_id
+		where course.course_id=#{course_id}
+	</select>
+
+	<select id="selecttopics" parameterType="String" resultType="pojo.Topic">
+		select course.course_name,topic_id,topic,keyword,name,creation_time,student_num,topic.maxnum from topic,teacher,course 
+		where topic.teacher_id=teacher.teacher_id and course.course_id=topic.course_id and course.course_id=#{course_id}
+	</select>
+	
+	<insert id="addtopic" parameterType="pojo.Topic">
+		insert into topic (topic_id,course_id,teacher_id,topic,keyword,creation_time,student_num,maxnum) 
+		values(#{topic_id},#{course_id},#{teacher_id},#{topic},#{keyword},#{creation_time},#{student_num},#{maxnum})
+	</insert>
+	
+	<select id="selectteachers" parameterType="String" resultType="pojo.Tc">
+		select course_name,tc.teacher_id,name,tea_identity,teacher_hour 
+		from teacher,tc,course 
+		where teacher.teacher_id=tc.teacher_id and tc.course_id=course.course_id and tc.course_id=#{course_id}
+	</select>
+	
+	<select id="selectpaperlist" parameterType="pojo.Paper" resultType="pojo.Paper">
+		select paper_id,title,author,source,keyword,abstracts,doc_location,student_id,uploading_time
+		from paper where course_id=#{course_id} and student_id=#{student_id}
+	</select>
+	
+	<update id="upscore" parameterType="pojo.Sc">
+		update sc set score=#{score} where student_id=#{student_id} and course_id=#{course_id}
+	</update>
+	
+	<delete id="deletesc" parameterType="pojo.Sc">
+		delete from sc where student_id=#{student_id} and course_id=#{course_id}
+	</delete>
+	
+	<insert id="addsc" parameterType="pojo.Sc">
+		insert into sc(student_id,course_id,score)values(#{student_id},#{course_id},#{score})
+	</insert>
+	
+	<select id="topicdetails" parameterType="String" resultType="pojo.Student">
+		select student.student_id,name,sex,major,classes from student,stutopic
+		where student.student_id=stutopic.student_id and topic_id=#{topic_id}
+	</select>
+	
+	<select id="selectdetails" parameterType="String" resultType="String">
+		select details from topic where topic_id=#{topic_id}
+	</select>
+	
+<!-- 	teachermanateacher -->
+	<insert id="addtc" parameterType="pojo.Tc">
+		insert into tc(course_id,teacher_id,tea_identity,teacher_hour)values(#{course_id},#{teacher_id},#{tea_identity},#{teacher_hour})
+	</insert>
+	
+	<update id="uptc" parameterType="pojo.Tc">
+		update tc set tea_identity=#{tea_identity},teacher_hour=#{teacher_hour} where course_id=#{course_id} and teacher_id=#{teacher_id}
+	</update>
+	
+	<delete id="deletetc" parameterType="pojo.Tc">
+		delete from tc where course_id=#{course_id} and teacher_id=#{teacher_id}
+	</delete>
+	
+	<select id="selectcn" parameterType="String" resultType="String">
+		select course_name from course where course_id=#{course_id}
+	</select>
+</mapper>
